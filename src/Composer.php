@@ -13,6 +13,9 @@ use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
 use OutOfBoundsException;
 
+/**
+ * Composer帮助类
+ */
 class Composer
 {
     /**
