@@ -16,13 +16,35 @@ use OutOfBoundsException;
 class Composer
 {
     /**
-     * @var ClassLoader|null classloader实例
+     * @var ClassLoader classloader实例
      */
-    protected ?ClassLoader $classLoader = null;
+    protected ClassLoader $classLoader;
 
-    public function __construct(ClassLoader $classLoader)
+    public function __construct(?ClassLoader $classLoader = null)
     {
-        $this->classLoader = $classLoader;
+        // 如果不指定传入的class loader 就从当前系统内去获取
+        if ($classLoader !== null) {
+            $this->classLoader = $classLoader;
+        }else{
+            $this->initClassLoader();
+        }
+    }
+
+    /**
+     * 通过系统内置函数获取到class Loader的实例
+     */
+    protected function initClassLoader()
+    {
+        $loaders = spl_autoload_functions();
+        foreach ($loaders as &$loader)
+        {
+           if (is_array($loader) && $loader[0] instanceof ClassLoader)
+           {
+               $this->classLoader = $loader[0];
+               return;
+           }
+        }
+        unset($loader);
     }
 
     /**
