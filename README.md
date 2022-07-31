@@ -39,7 +39,7 @@ composer require death_satan/composer --dev
  */
 $classLoader = require __DIR__.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php'
 
-$composer = new \SaTan\Composer($classLoader);
+$composer = new \SaTan\ComposerHelpers($classLoader);
 ```
 
 ---
