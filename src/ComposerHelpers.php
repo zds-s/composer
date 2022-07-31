@@ -13,16 +13,60 @@ use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
 use OutOfBoundsException;
 
-class Composer
+class ComposerHelpers
 {
-    /**
-     * @var ClassLoader|null classloader实例
-     */
     protected ?ClassLoader $classLoader = null;
 
-    public function __construct(ClassLoader $classLoader)
+    public function __construct(?ClassLoader $classLoader = null)
     {
         $this->classLoader = $classLoader;
+        // 如果不指定传入的class loader 就从当前系统内去获取
+        if ($classLoader === null) {
+            $this->initClassLoader();
+        }
+        $this->initInstallHelpers();
+    }
+
+    protected InstallVersionHelpers $install_version_helpers;
+
+    protected function initInstallHelpers()
+    {
+        $this->install_version_helpers = new InstallVersionHelpers();
+    }
+
+    /**
+     * @return InstallVersionHelpers
+     */
+    public function getInstallVersionHelpers(): InstallVersionHelpers
+    {
+        return $this->install_version_helpers;
+    }
+
+    /**
+     * @param ClassLoader $classLoader
+     * @return ComposerHelpers
+     */
+    public function setClassLoader(ClassLoader $classLoader): ComposerHelpers
+    {
+        $this->classLoader = $classLoader;
+        return $this;
+    }
+
+    /**
+     * 通过系统内置函数获取到class Loader的实例
+     */
+    protected function initClassLoader()
+    {
+        $loaders = spl_autoload_functions();
+        foreach ($loaders as $loader)
+        {
+           if (is_array($loader) && $loader[0] instanceof ClassLoader)
+           {
+               $this->classLoader = $loader[0];
+               return;
+           }
+        }
+        throw new \RuntimeException('Class Loader NotFound');
     }
 
     /**
@@ -59,34 +103,31 @@ class Composer
     /**
      * 获取包的目录
      * @param string $packageName 包名
-     * @return string|null
+     * @return string
      * @throws OutOfBoundsException
      */
-    public function getPackagePath(string $packageName): ?string
+    public function getPackagePath(string $packageName): string
     {
-        return InstalledVersions::getInstallPath($packageName);
+        return $this->getInstallVersionHelpers()->getPackagePath($packageName);
     }
 
     /**
      * 检查是否存在某个包
      * @param string $packageName 包名
-     * @param bool $includeDevRequirements dev_requirement
      * @return bool
      */
-    public function hasPackage(string $packageName, bool $includeDevRequirements = true): bool
+    public function hasPackage(string $packageName): bool
     {
-        return InstalledVersions::isInstalled($packageName, $includeDevRequirements);
+        return $this->getInstallVersionHelpers()->isInstallPackage($packageName);
     }
 
     /**
      * 返回当前所有已加载的包
-     * @param ?string $type 包类型:library|project
      * @return array
      */
-    public function packages(?string $type = null): array
+    public function packages(): array
     {
-        if ($type === null) return InstalledVersions::getInstalledPackages();
-        else return InstalledVersions::getInstalledPackagesByType($type);
+        return InstalledVersions::getInstalledPackages();
     }
 
     /**
@@ -96,7 +137,7 @@ class Composer
      */
     public function getAllRawData(bool $is_merge = true): array
     {
-        $data = InstalledVersions::getAllRawData();
+        $data = InstalledVersions::getRawData();
         if (!$is_merge) return $data;
 
         $install_data = [];
@@ -130,7 +171,7 @@ class Composer
      * @param string|array $namespace 命名空间
      * @param bool|string|array $directory 目录|可以是二维数组的目录
      */
-    public function setPsr0($namespace, $directory = false)
+    public function setPsr0(array|string $namespace, $directory = false)
     {
         if (is_array($namespace)) {
             foreach ($namespace as &$name) {
@@ -146,7 +187,7 @@ class Composer
      * @param string|array $namespace 命名空间
      * @param bool|string|array $directory 目录|可以是二维数组的目录
      */
-    public function setPsr4($namespace, $directory = false)
+    public function setPsr4(array|string $namespace, $directory = false)
     {
         if (is_array($namespace)) {
             foreach ($namespace as &$name) {
@@ -170,11 +211,11 @@ class Composer
     /**
      * 动态添加psr-4映射
      * @param string|array $namespace 命名空间
-     * @param string|array|null $directory 目录|可以是二维数组的目录
+     * @param null $directory 目录|可以是二维数组的目录
      * @param bool $prepend 是否覆盖在最栈最上方
      * @return void
      */
-    public function addPsr4($namespace, $directory = null, bool $prepend = false): void
+    public function addPsr4(array|string $namespace, $directory = null, bool $prepend = false): void
     {
         if (is_array($namespace) && is_null($directory)) {
             foreach ($namespace as $name => $dir) {
@@ -183,17 +224,16 @@ class Composer
             return;
         }
         $this->classLoader->addPsr4($this->detectNamespace($namespace), $directory, $prepend);
-        return;
     }
 
     /**
      * 动态添加psr-0映射
      * @param string|array $namespace 命名空间
-     * @param string|array|null $directory 目录|可以是二维数组的目录
+     * @param null $directory 目录|可以是二维数组的目录
      * @param bool $prepend 是否覆盖在最栈最上方
      * @return void
      */
-    public function addPsr0($namespace, $directory = null, bool $prepend = false): void
+    public function addPsr0(array|string $namespace, $directory = null, bool $prepend = false): void
     {
         if (is_array($namespace) && is_null($directory)) {
             foreach ($namespace as $name => $dir) {
@@ -219,7 +259,7 @@ class Composer
      * @param string $class
      * @return false|string
      */
-    public function findClassFile(string $class)
+    public function findClassFile(string $class): bool|string
     {
         return $this->classLoader->findFile($class);
     }
