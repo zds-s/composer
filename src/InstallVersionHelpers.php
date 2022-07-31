@@ -108,6 +108,7 @@ class InstallVersionHelpers
     /**
      * 获取指定包的版本
      * @param string $packageName
+     * @param bool $normalized
      * @return string|null
      */
     public function getPackageVersion(string $packageName,bool $normalized = false):?string

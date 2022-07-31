@@ -15,8 +15,11 @@ use OutOfBoundsException;
 
 class ComposerHelpers
 {
-    public function __construct(protected ?ClassLoader $classLoader = null)
+    protected ?ClassLoader $classLoader = null;
+
+    public function __construct(?ClassLoader $classLoader = null)
     {
+        $this->classLoader = $classLoader;
         // 如果不指定传入的class loader 就从当前系统内去获取
         if ($classLoader === null) {
             $this->initClassLoader();
