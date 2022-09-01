@@ -259,7 +259,7 @@ class ComposerHelpers
      * @param string $class
      * @return false|string
      */
-    public function findClassFile(string $class): bool|string
+    public function findClassFile(string $class)
     {
         return $this->classLoader->findFile($class);
     }
