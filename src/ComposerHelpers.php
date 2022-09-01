@@ -171,7 +171,7 @@ class ComposerHelpers
      * @param string|array $namespace 命名空间
      * @param bool|string|array $directory 目录|可以是二维数组的目录
      */
-    public function setPsr0(array|string $namespace, $directory = false)
+    public function setPsr0($namespace, $directory = false)
     {
         if (is_array($namespace)) {
             foreach ($namespace as &$name) {
@@ -187,7 +187,7 @@ class ComposerHelpers
      * @param string|array $namespace 命名空间
      * @param bool|string|array $directory 目录|可以是二维数组的目录
      */
-    public function setPsr4(array|string $namespace, $directory = false)
+    public function setPsr4($namespace, $directory = false)
     {
         if (is_array($namespace)) {
             foreach ($namespace as &$name) {
@@ -215,7 +215,7 @@ class ComposerHelpers
      * @param bool $prepend 是否覆盖在最栈最上方
      * @return void
      */
-    public function addPsr4(array|string $namespace, $directory = null, bool $prepend = false): void
+    public function addPsr4($namespace, $directory = null, bool $prepend = false): void
     {
         if (is_array($namespace) && is_null($directory)) {
             foreach ($namespace as $name => $dir) {
@@ -233,7 +233,7 @@ class ComposerHelpers
      * @param bool $prepend 是否覆盖在最栈最上方
      * @return void
      */
-    public function addPsr0(array|string $namespace, $directory = null, bool $prepend = false): void
+    public function addPsr0($namespace, $directory = null, bool $prepend = false): void
     {
         if (is_array($namespace) && is_null($directory)) {
             foreach ($namespace as $name => $dir) {
