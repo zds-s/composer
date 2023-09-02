@@ -9,3 +9,4 @@ $class_loader = require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIREC
 $helpers = new \SaTan\ComposerHelpers();
 $install_helpers = $helpers->getInstallVersionHelpers();
 var_dump($install_helpers->getPackagePath('death_satan/array-helpers'));
+

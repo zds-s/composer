@@ -12,6 +12,7 @@ namespace SaTan;
 use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
 use OutOfBoundsException;
+use RuntimeException;
 
 class ComposerHelpers
 {
@@ -66,7 +67,7 @@ class ComposerHelpers
                return;
            }
         }
-        throw new \RuntimeException('Class Loader NotFound');
+        throw new RuntimeException('Class Loader NotFound');
     }
 
     /**
@@ -156,8 +157,7 @@ class ComposerHelpers
         return $this->classLoader->getClassMap();
     }
 
-    /**
-     * 检测命名空间是否正确,如果不正确自动补齐
+    /** 检测命名空间是否正确,如果不正确自动补齐
      * @param string $namespace 命名空间
      * @return string
      */
@@ -187,7 +187,7 @@ class ComposerHelpers
      * @param string|array $namespace 命名空间
      * @param bool|string|array $directory 目录|可以是二维数组的目录
      */
-    public function setPsr4($namespace, $directory = false)
+    public function setPsr4( $namespace, $directory = false)
     {
         if (is_array($namespace)) {
             foreach ($namespace as &$name) {
